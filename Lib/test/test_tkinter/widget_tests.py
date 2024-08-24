@@ -4,6 +4,8 @@ import re
 import tkinter
 from test.test_tkinter.support import (AbstractTkTest, requires_tk, tk_version,
                                   pixels_conv, tcl_obj_eq)
+# Should depend on the  patchlevel
+from test.test_tkinter.support import messages_v2 as messages
 import test.support
 
 
@@ -173,7 +175,7 @@ class AbstractWidgetTest(AbstractTkTest):
         image = tkinter.PhotoImage(master=self.root, name='image1')
         self.checkParam(widget, name, image, conv=str)
         self.checkInvalidParam(widget, name, 'spam',
-                errmsg='image "spam" doesn\'t exist')
+                errmsg=messages['no_image'].format('spam'))
         widget[name] = ''
 
     def checkVariableParam(self, widget, name, var):
@@ -313,7 +315,7 @@ class StandardOptionsTests:
         is_ttk = widget.__class__.__module__ == 'tkinter.ttk'
         if not is_ttk:
             self.checkInvalidParam(widget, 'font', '',
-                                   errmsg='font "" doesn\'t exist')
+                                   errmsg=messages['no_font'].format(''))
 
     def test_configure_foreground(self):
         widget = self.create()

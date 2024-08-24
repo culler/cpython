@@ -8,6 +8,9 @@ from test.test_tkinter.support import AbstractTkTest, AbstractDefaultRootTest, r
 
 support.requires('gui')
 
+# Should depend on the patchlevel.
+from test.test_tkinter.support import messages_v2 as messages
+
 class MiscTest(AbstractTkTest, unittest.TestCase):
 
     def test_all(self):
@@ -66,9 +69,9 @@ class MiscTest(AbstractTkTest, unittest.TestCase):
         f.tk_busy_forget()
         self.assertFalse(f.tk_busy_status())
         self.assertFalse(f.tk_busy_current())
-        with self.assertRaisesRegex(TclError, "can't find busy window"):
+        with self.assertRaisesRegex(TclError, messages["no_busy"]):
             f.tk_busy_configure()
-        with self.assertRaisesRegex(TclError, "can't find busy window"):
+        with self.assertRaisesRegex(TclError, messages["no_busy"]):
             f.tk_busy_forget()
 
     @requires_tk(8, 6, 6)
@@ -87,7 +90,7 @@ class MiscTest(AbstractTkTest, unittest.TestCase):
         self.assertEqual(f.tk_busy_configure('cursor')[4], 'heart')
 
         f.tk_busy_forget()
-        with self.assertRaisesRegex(TclError, "can't find busy window"):
+        with self.assertRaisesRegex(TclError, messaages["no_busy"]):
             f.tk_busy_cget('cursor')
 
     def test_tk_setPalette(self):
