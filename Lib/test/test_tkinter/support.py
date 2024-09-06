@@ -1,4 +1,5 @@
 import functools
+import re
 import tkinter
 
 messages_v1 = {
@@ -123,6 +124,10 @@ units = {
 
 def pixels_conv(value):
     return float(value[:-1]) * units[value[-1:]]
+
+pix_re = re.compile(r'[0-9]*\.?[0-9]*[cimp]{1}')
+def is_pixel_str(x):
+    return pix_re.fullmatch(x) != None
 
 def tcl_obj_eq(actual, expected):
     if actual == expected:

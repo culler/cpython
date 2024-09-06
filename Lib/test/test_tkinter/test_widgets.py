@@ -67,6 +67,7 @@ class ToplevelTest(AbstractToplevelTest, unittest.TestCase):
         'menu', 'padx', 'pady', 'relief', 'screen',
         'takefocus', 'tile', 'use', 'visual', 'width',
     )
+    _clipped = set()
 
     def create(self, **kwargs):
         return tkinter.Toplevel(self.root, **kwargs)
@@ -109,6 +110,7 @@ class FrameTest(AbstractToplevelTest, unittest.TestCase):
         'highlightbackground', 'highlightcolor', 'highlightthickness',
         'padx', 'pady', 'relief', 'takefocus', 'tile', 'visual', 'width',
     )
+    _clipped = set()
 
     def create(self, **kwargs):
         return tkinter.Frame(self.root, **kwargs)
@@ -124,6 +126,7 @@ class LabelFrameTest(AbstractToplevelTest, unittest.TestCase):
         'labelanchor', 'labelwidget', 'padx', 'pady', 'relief',
         'takefocus', 'text', 'visual', 'width',
     )
+    _clipped = set()
 
     def create(self, **kwargs):
         return tkinter.LabelFrame(self.root, **kwargs)
@@ -144,9 +147,11 @@ class LabelFrameTest(AbstractToplevelTest, unittest.TestCase):
 
 class AbstractLabelTest(AbstractWidgetTest, IntegerSizeTests):
     _conv_pixels = False
-    _clip_highlightthickness = tk_version >= (8, 7)
-    _clip_pad = tk_version >= (8, 7)
-    _clip_borderwidth = tk_version >= (8, 7)
+    _clipped = set() if tk_version < (9,0) else set(
+        ('highlightthickness', 'padx', 'pady', 'borderwidth'))
+    #_clip_highlightthickness = tk_version >= (9, 0)
+    #_clip_pad = tk_version >= (8, 7)
+    #_clip_borderwidth = tk_version >= (8, 7)
 
 
 @add_standard_options(StandardOptionsTests)
@@ -328,9 +333,12 @@ class OptionMenuTest(MenubuttonTest, unittest.TestCase):
         with self.assertRaisesRegex(TclError, r"^unknown option -image$"):
             tkinter.OptionMenu(self.root, None, 'b', image='')
 
-
 @add_standard_options(IntegerSizeTests, StandardOptionsTests)
 class EntryTest(AbstractWidgetTest, unittest.TestCase):
+    _conv_pixels = False
+    _clipped = set() if tk_version < (9,0) else set(
+        ('highlightthickness', 'borderwidth', 'insertborderwidth'))
+
     OPTIONS = (
         'background', 'borderwidth', 'cursor',
         'disabledbackground', 'disabledforeground',
@@ -355,17 +363,25 @@ class EntryTest(AbstractWidgetTest, unittest.TestCase):
     def test_configure_insertborderwidth(self):
         widget = self.create(insertwidth=100)
         self.checkPixelsParam(widget, 'insertborderwidth',
-                              0, 1.3, 2.6, 6, -2, '10p')
+                              0, 1.3, 2.6, 6, '10p')
+        self.checkParam(widget, 'insertborderwidth', -2,
+                        conv=self._conv_pixels)
         # insertborderwidth is bounded above by a half of insertwidth.
-        self.checkParam(widget, 'insertborderwidth', 60, expected=100//2)
+        expected =  100 // 2 if tk_version < (9, 0) else 60
+        self.checkParam(widget, 'insertborderwidth', 60, expected=expected)
 
     def test_configure_insertwidth(self):
         widget = self.create()
         self.checkPixelsParam(widget, 'insertwidth', 1.3, 3.6, '10p')
-        self.checkParam(widget, 'insertwidth', 0.1, expected=2)
-        self.checkParam(widget, 'insertwidth', -2, expected=2)
-        self.checkParam(widget, 'insertwidth', 0.9, expected=1)
-
+        if tk_version < (9, 0):
+            self.checkParam(widget, 'insertwidth', 0.1, expected=2)
+            self.checkParam(widget, 'insertwidth', -2, expected=2)
+            self.checkParam(widget, 'insertwidth', 0.9, expected=1)
+        else:
+            self.checkParam(widget, 'insertwidth', 0.1)
+            self.checkParam(widget, 'insertwidth', -2, expected=0)
+            self.checkParam(widget, 'insertwidth', 0.9)
+            
     def test_configure_invalidcommand(self):
         widget = self.create()
         self.checkCommandParam(widget, 'invalidcommand')
@@ -574,6 +590,7 @@ class TextTest(AbstractWidgetTest, unittest.TestCase):
         'tabs', 'tabstyle', 'takefocus', 'undo', 'width', 'wrap',
         'xscrollcommand', 'yscrollcommand',
     )
+    _clipped = set()
 
     def create(self, **kwargs):
         return tkinter.Text(self.root, **kwargs)
@@ -710,8 +727,10 @@ class CanvasTest(AbstractWidgetTest, unittest.TestCase):
         'xscrollcommand', 'xscrollincrement',
         'yscrollcommand', 'yscrollincrement', 'width',
     )
+    _clipped = set() if tk_version < (9,0) else set(
+        ('highlightthickness',))
 
-    _conv_pixels = round
+    ##_conv_pixels = round
     _stringify = True
 
     def create(self, **kwargs):
@@ -965,6 +984,7 @@ class ListboxTest(AbstractWidgetTest, unittest.TestCase):
         'selectmode', 'setgrid', 'state',
         'takefocus', 'width', 'xscrollcommand', 'yscrollcommand',
     )
+    _clipped = set()
 
     def create(self, **kwargs):
         return tkinter.Listbox(self.root, **kwargs)
@@ -1102,6 +1122,7 @@ class ScaleTest(AbstractWidgetTest, unittest.TestCase):
         'resolution', 'showvalue', 'sliderlength', 'sliderrelief', 'state',
         'takefocus', 'tickinterval', 'to', 'troughcolor', 'variable', 'width',
     )
+    _clipped = set()
     default_orient = 'vertical'
 
     def create(self, **kwargs):
@@ -1170,6 +1191,7 @@ class ScrollbarTest(AbstractWidgetTest, unittest.TestCase):
         'repeatdelay', 'repeatinterval',
         'takefocus', 'troughcolor', 'width',
     )
+    _clipped = set()
     _conv_pixels = round
     _stringify = True
     default_orient = 'vertical'
@@ -1219,6 +1241,8 @@ class PanedWindowTest(AbstractWidgetTest, unittest.TestCase):
         'sashcursor', 'sashpad', 'sashrelief', 'sashwidth',
         'showhandle', 'width',
     )
+    _clipped = set()
+
     default_orient = 'horizontal'
 
     def create(self, **kwargs):
@@ -1390,6 +1414,7 @@ class MenuTest(AbstractWidgetTest, unittest.TestCase):
         'tearoff', 'tearoffcommand', 'title', 'type',
     )
     _conv_pixels = False
+    _clipped = set()
 
     def create(self, **kwargs):
         return tkinter.Menu(self.root, **kwargs)
@@ -1467,6 +1492,7 @@ class MessageTest(AbstractWidgetTest, unittest.TestCase):
         'justify', 'padx', 'pady', 'relief',
         'takefocus', 'text', 'textvariable', 'width',
     )
+    _clipped = set()
     _conv_pad_pixels = False
     if tk_version >= (8, 7):
         _conv_pixels = False
