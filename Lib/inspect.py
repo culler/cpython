@@ -325,6 +325,11 @@ def ismethoddescriptor(object):
     if isclass(object) or ismethod(object) or isfunction(object):
         # mutual exclusion
         return False
+    if isinstance(object, functools.partial):
+        # Lie for children.  The addition of partial.__get__
+        # doesn't currently change the partial objects behaviour,
+        # not counting a warning about future changes.
+        return False
     tp = type(object)
     return (hasattr(tp, "__get__")
             and not hasattr(tp, "__set__")
@@ -1077,10 +1082,10 @@ def findsource(object):
 
     if isclass(object):
         try:
-            firstlineno = object.__firstlineno__
-        except AttributeError:
+            firstlineno = vars(object)['__firstlineno__']
+        except (TypeError, KeyError):
             raise OSError('source code not available')
-        return lines, object.__firstlineno__ - 1
+        return lines, firstlineno - 1
 
     if ismethod(object):
         object = object.__func__

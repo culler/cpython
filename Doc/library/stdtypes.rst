@@ -209,18 +209,18 @@ Numeric Types --- :class:`int`, :class:`float`, :class:`complex`
    pair: object; numeric
    pair: object; Boolean
    pair: object; integer
-   pair: object; floating point
+   pair: object; floating-point
    pair: object; complex number
    pair: C; language
 
-There are three distinct numeric types: :dfn:`integers`, :dfn:`floating
-point numbers`, and :dfn:`complex numbers`.  In addition, Booleans are a
-subtype of integers.  Integers have unlimited precision.  Floating point
+There are three distinct numeric types: :dfn:`integers`, :dfn:`floating-point
+numbers`, and :dfn:`complex numbers`.  In addition, Booleans are a
+subtype of integers.  Integers have unlimited precision.  Floating-point
 numbers are usually implemented using :c:expr:`double` in C; information
-about the precision and internal representation of floating point
+about the precision and internal representation of floating-point
 numbers for the machine on which your program is running is available
 in :data:`sys.float_info`.  Complex numbers have a real and imaginary
-part, which are each a floating point number.  To extract these parts
+part, which are each a floating-point number.  To extract these parts
 from a complex number *z*, use ``z.real`` and ``z.imag``. (The standard
 library includes the additional numeric types :mod:`fractions.Fraction`, for
 rationals, and :mod:`decimal.Decimal`, for floating-point numbers with
@@ -229,7 +229,7 @@ user-definable precision.)
 .. index::
    pair: numeric; literals
    pair: integer; literals
-   pair: floating point; literals
+   pair: floating-point; literals
    pair: complex number; literals
    pair: hexadecimal; literals
    pair: octal; literals
@@ -238,7 +238,7 @@ user-definable precision.)
 Numbers are created by numeric literals or as the result of built-in functions
 and operators.  Unadorned integer literals (including hex, octal and binary
 numbers) yield integers.  Numeric literals containing a decimal point or an
-exponent sign yield floating point numbers.  Appending ``'j'`` or ``'J'`` to a
+exponent sign yield floating-point numbers.  Appending ``'j'`` or ``'J'`` to a
 numeric literal yields an imaginary number (a complex number with a zero real
 part) which you can add to an integer or float to get a complex number with real
 and imaginary parts.
@@ -832,7 +832,7 @@ over ``&``, ``|`` and ``^``.
 .. deprecated:: 3.12
 
    The use of the bitwise inversion operator ``~`` is deprecated and will
-   raise an error in Python 3.14.
+   raise an error in Python 3.16.
 
 :class:`bool` is a subclass of :class:`int` (see :ref:`typesnumeric`). In
 many numeric contexts, ``False`` and ``True`` behave like the integers 0 and 1, respectively.
@@ -1209,8 +1209,9 @@ accepts integers that meet the value restriction ``0 <= x <= 255``).
 | ``s.pop()`` or ``s.pop(i)``  | retrieves the item at *i* and  | \(2)                |
 |                              | also removes it from *s*       |                     |
 +------------------------------+--------------------------------+---------------------+
-| ``s.remove(x)``              | remove the first item from *s* | \(3)                |
-|                              | where ``s[i]`` is equal to *x* |                     |
+| ``s.remove(x)``              | removes the first item from    | \(3)                |
+|                              | *s* where ``s[i]`` is equal to |                     |
+|                              | *x*                            |                     |
 +------------------------------+--------------------------------+---------------------+
 | ``s.reverse()``              | reverses the items of *s* in   | \(4)                |
 |                              | place                          |                     |
@@ -1497,8 +1498,8 @@ objects that compare equal might have different :attr:`~range.start`,
 .. seealso::
 
    * The `linspace recipe <https://code.activestate.com/recipes/579000-equally-spaced-numbers-linspace/>`_
-     shows how to implement a lazy version of range suitable for floating
-     point applications.
+     shows how to implement a lazy version of range suitable for floating-point
+     applications.
 
 .. index::
    single: string; text sequence type
@@ -2442,19 +2443,19 @@ The conversion types are:
 +------------+-----------------------------------------------------+-------+
 | ``'X'``    | Signed hexadecimal (uppercase).                     | \(2)  |
 +------------+-----------------------------------------------------+-------+
-| ``'e'``    | Floating point exponential format (lowercase).      | \(3)  |
+| ``'e'``    | Floating-point exponential format (lowercase).      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'E'``    | Floating point exponential format (uppercase).      | \(3)  |
+| ``'E'``    | Floating-point exponential format (uppercase).      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'f'``    | Floating point decimal format.                      | \(3)  |
+| ``'f'``    | Floating-point decimal format.                      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'F'``    | Floating point decimal format.                      | \(3)  |
+| ``'F'``    | Floating-point decimal format.                      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'g'``    | Floating point format. Uses lowercase exponential   | \(4)  |
+| ``'g'``    | Floating-point format. Uses lowercase exponential   | \(4)  |
 |            | format if exponent is less than -4 or not less than |       |
 |            | precision, decimal format otherwise.                |       |
 +------------+-----------------------------------------------------+-------+
-| ``'G'``    | Floating point format. Uses uppercase exponential   | \(4)  |
+| ``'G'``    | Floating-point format. Uses uppercase exponential   | \(4)  |
 |            | format if exponent is less than -4 or not less than |       |
 |            | precision, decimal format otherwise.                |       |
 +------------+-----------------------------------------------------+-------+
@@ -3440,7 +3441,7 @@ place, and instead produce new objects.
    ``b'abcdefghijklmnopqrstuvwxyz'``. Uppercase ASCII characters
    are those byte values in the sequence ``b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'``.
 
-   Unlike :func:`str.swapcase()`, it is always the case that
+   Unlike :func:`str.swapcase`, it is always the case that
    ``bin.swapcase().swapcase() == bin`` for the binary versions. Case
    conversions are symmetrical in ASCII, even though that is not generally
    true for arbitrary Unicode code points.
@@ -3661,19 +3662,19 @@ The conversion types are:
 +------------+-----------------------------------------------------+-------+
 | ``'X'``    | Signed hexadecimal (uppercase).                     | \(2)  |
 +------------+-----------------------------------------------------+-------+
-| ``'e'``    | Floating point exponential format (lowercase).      | \(3)  |
+| ``'e'``    | Floating-point exponential format (lowercase).      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'E'``    | Floating point exponential format (uppercase).      | \(3)  |
+| ``'E'``    | Floating-point exponential format (uppercase).      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'f'``    | Floating point decimal format.                      | \(3)  |
+| ``'f'``    | Floating-point decimal format.                      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'F'``    | Floating point decimal format.                      | \(3)  |
+| ``'F'``    | Floating-point decimal format.                      | \(3)  |
 +------------+-----------------------------------------------------+-------+
-| ``'g'``    | Floating point format. Uses lowercase exponential   | \(4)  |
+| ``'g'``    | Floating-point format. Uses lowercase exponential   | \(4)  |
 |            | format if exponent is less than -4 or not less than |       |
 |            | precision, decimal format otherwise.                |       |
 +------------+-----------------------------------------------------+-------+
-| ``'G'``    | Floating point format. Uses uppercase exponential   | \(4)  |
+| ``'G'``    | Floating-point format. Uses uppercase exponential   | \(4)  |
 |            | format if exponent is less than -4 or not less than |       |
 |            | precision, decimal format otherwise.                |       |
 +------------+-----------------------------------------------------+-------+
@@ -3895,7 +3896,7 @@ copying.
          >>> a == b
          False
 
-      Note that, as with floating point numbers, ``v is w`` does *not* imply
+      Note that, as with floating-point numbers, ``v is w`` does *not* imply
       ``v == w`` for memoryview objects.
 
       .. versionchanged:: 3.3
@@ -3986,7 +3987,7 @@ copying.
       dangling resources) as soon as possible.
 
       After this method has been called, any further operation on the view
-      raises a :class:`ValueError` (except :meth:`release()` itself which can
+      raises a :class:`ValueError` (except :meth:`release` itself which can
       be called multiple times)::
 
          >>> m = memoryview(b'abc')

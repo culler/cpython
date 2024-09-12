@@ -347,7 +347,7 @@
             }
             STAT_INC(TO_BOOL, hit);
             if (_PyLong_IsZero((PyLongObject *)value)) {
-                assert(_Py_IsImmortal(value));
+                assert(_Py_IsImmortalLoose(value));
                 res = Py_False;
             }
             else {
@@ -398,7 +398,7 @@
             }
             STAT_INC(TO_BOOL, hit);
             if (value == &_Py_STR(empty)) {
-                assert(_Py_IsImmortal(value));
+                assert(_Py_IsImmortalLoose(value));
                 res = Py_False;
             }
             else {
@@ -2635,6 +2635,7 @@
                     if (!_PyErr_ExceptionMatches(tstate, PyExc_StopIteration)) {
                         JUMP_TO_ERROR();
                     }
+                    _PyEval_MonitorRaise(tstate, frame, frame->instr_ptr);
                     _PyErr_Clear(tstate);
                 }
                 /* iterator ended normally */
@@ -4389,8 +4390,6 @@
                 if (optimized <= 0) {
                     exit->temperature = restart_backoff_counter(exit->temperature);
                     if (optimized < 0) {
-                        Py_DECREF(current_executor);
-                        tstate->previous_executor = Py_None;
                         GOTO_UNWIND();
                     }
                     GOTO_TIER_ONE(target);
