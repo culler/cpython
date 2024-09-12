@@ -116,7 +116,7 @@ PyAPI_FUNC(PyLockStatus) PyThread_acquire_lock_timed_with_retries(
     PyThread_type_lock,
     PY_TIMEOUT_T microseconds);
 
-typedef size_t PyThread_ident_t;
+typedef uint64_t PyThread_ident_t;
 typedef Py_uintptr_t PyThread_handle_t;
 
 #define PY_FORMAT_THREAD_IDENT_T "llu"
