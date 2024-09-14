@@ -7,8 +7,10 @@ from test.support import requires
 from test.test_tkinter.support import (requires_tk, tk_version,
                                   get_tk_patchlevel, widget_eq,
                                   AbstractDefaultRootTest)
-# Message version should depend on the  patchlevel
-from test.test_tkinter.support import messages_v2 as messages, is_pixel_str
+if tk_version < (9,0):
+    from test.test_tkinter.support import messages_v1 as messages, is_pixel_str
+else:
+    from test.test_tkinter.support import messages_v2 as messages, is_pixel_str
 from test.test_tkinter.widget_tests import (
     add_configure_tests,
     AbstractWidgetTest,
@@ -26,9 +28,11 @@ def float_round(x):
 
 
 class AbstractToplevelTest(AbstractWidgetTest, PixelSizeTests):
-    _conv_pixels = False
-    _clipped = set(('borderwidth', 'height', 'highlightthickness',
-                    'padx', 'pady', 'width'))
+    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {}
+    _clipped = {
+        'highlightthickness'} if tk_version < (9,0) else {
+        'borderwidth', 'height', 'highlightthickness', 'padx', 'pady',
+        'width'}
 
     def test_configure_class(self):
         widget = self.create()
@@ -115,6 +119,7 @@ class FrameTest(AbstractToplevelTest, unittest.TestCase):
         'highlightbackground', 'highlightcolor', 'highlightthickness',
         'padx', 'pady', 'relief', 'takefocus', 'tile', 'visual', 'width',
     )
+    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {}
 
     def create(self, **kwargs):
         return tkinter.Frame(self.root, **kwargs)
@@ -149,7 +154,7 @@ class LabelFrameTest(AbstractToplevelTest, unittest.TestCase):
 
 # Label, Button, Checkbutton, Radiobutton, MenuButton
 class AbstractLabelTest(AbstractWidgetTest, IntegerSizeTests):
-    _conv_pixels = False
+    _rounds_pixels = False
     _clipped = set() if tk_version < (9,0) else {
         'borderwidth', 'insertborderwidth', 'highlightthickness',
         'padx', 'pady'}
@@ -281,7 +286,9 @@ class MenubuttonTest(AbstractLabelTest, unittest.TestCase):
         'takefocus', 'text', 'textvariable',
         'underline', 'width', 'wraplength',
     )
-    _clipped = set() if tk_version < (9,0) else { 'insertborderwidth',
+    _rounds_pixels = tk_version < (9,0)
+    _clipped = {'highlightthickness', 'padx', 'pady'
+        } if tk_version < (9,0) else { 'insertborderwidth',
         'highlightthickness', 'padx', 'pady'}
 
     def create(self, **kwargs):
@@ -332,10 +339,10 @@ class OptionMenuTest(MenubuttonTest, unittest.TestCase):
 
 @add_configure_tests(IntegerSizeTests, StandardOptionsTests)
 class EntryTest(AbstractWidgetTest, unittest.TestCase):
-    _conv_pixels = False
-    _clipped = set() if tk_version < (9,0) else set((
+    _rounds_pixels = (tk_version < (9,0))
+    _clipped = {'highlightthickness'} if tk_version < (9,0) else {
         'highlightthickness', 'borderwidth', 'insertborderwidth',
-        'selectborderwidth'))
+        'selectborderwidth'}
 
     OPTIONS = (
         'background', 'borderwidth', 'cursor',
@@ -362,8 +369,7 @@ class EntryTest(AbstractWidgetTest, unittest.TestCase):
         widget = self.create(insertwidth=100)
         self.checkPixelsParam(widget, 'insertborderwidth',
                               0, 1.3, 2.6, 6, '10p')
-        self.checkParam(widget, 'insertborderwidth', -2,
-                        conv=self._conv_pixels)
+        self.checkParam(widget, 'insertborderwidth', -2)
         # insertborderwidth is bounded above by a half of insertwidth.
         expected =  100 // 2 if tk_version < (9, 0) else 60
         self.checkParam(widget, 'insertborderwidth', 60, expected=expected)
@@ -588,7 +594,8 @@ class TextTest(AbstractWidgetTest, unittest.TestCase):
         'tabs', 'tabstyle', 'takefocus', 'undo', 'width', 'wrap',
         'xscrollcommand', 'yscrollcommand',
     )
-    _conv_pixels = False
+    _rounds_pixels = (tk_version < (9,0))
+    _no_round = {'selectborderwidth'}
     _clipped = {'highlightthickness'}
 
     def create(self, **kwargs):
@@ -728,10 +735,7 @@ class CanvasTest(AbstractWidgetTest, unittest.TestCase):
         'xscrollcommand', 'xscrollincrement',
         'yscrollcommand', 'yscrollincrement', 'width',
     )
-    _clipped = set() if tk_version < (9,0) else set(
-        ('highlightthickness',))
-
-    ##_conv_pixels = round
+    _clipped = {'highlightthickness'}
     _stringify = True
 
     def create(self, **kwargs):
@@ -985,8 +989,10 @@ class ListboxTest(AbstractWidgetTest, unittest.TestCase):
         'selectmode', 'setgrid', 'state',
         'takefocus', 'width', 'xscrollcommand', 'yscrollcommand',
     )
-    _conv_pixels = False
-    _clipped = set(('borderwidth', 'highlightthickness', 'selectborderwidth'))
+    _rounds_pixels = (tk_version < (9,0))
+    _clipped = {'highlightthickness'
+        } if tk_version < (9,0) else { 'borderwidth',
+        'highlightthickness', 'selectborderwidth'}
 
     def create(self, **kwargs):
         return tkinter.Listbox(self.root, **kwargs)
@@ -1124,7 +1130,7 @@ class ScaleTest(AbstractWidgetTest, unittest.TestCase):
         'resolution', 'showvalue', 'sliderlength', 'sliderrelief', 'state',
         'takefocus', 'tickinterval', 'to', 'troughcolor', 'variable', 'width',
     )
-    _conv_pixels = False
+    _rounds_pixels = (tk_version < (9,0))
     _clipped = {'highlightthickness'}
     default_orient = 'vertical'
 
@@ -1194,8 +1200,9 @@ class ScrollbarTest(AbstractWidgetTest, unittest.TestCase):
         'repeatdelay', 'repeatinterval',
         'takefocus', 'troughcolor', 'width',
     )
-    _conv_pixels = round
-    _clipped = {'borderwidth', 'highlightthickness'}
+    _rounds_pixels = True
+    _clipped = {'highlightthickness'} if tk_version < (9,0) else{
+        'borderwidth', 'highlightthickness'}
     _stringify = True
     default_orient = 'vertical'
 
@@ -1244,8 +1251,10 @@ class PanedWindowTest(AbstractWidgetTest, unittest.TestCase):
         'sashcursor', 'sashpad', 'sashrelief', 'sashwidth',
         'showhandle', 'width',
     )
-    _conv_pixels = False
-    _clipped = set('borderwidth')
+    _rounds_pixels = True
+    _no_round = {'handlesize', 'height', 'proxyborderwidth', 'sashwidth',
+                     'selectborderwidth', 'width'}
+    _clipped = {} if tk_version < (9,0) else {'borderwidth'}
 
     default_orient = 'horizontal'
 
@@ -1416,7 +1425,7 @@ class MenuTest(AbstractWidgetTest, unittest.TestCase):
         'postcommand', 'relief', 'selectcolor', 'takefocus',
         'tearoff', 'tearoffcommand', 'title', 'type',
     )
-    _conv_pixels = False
+    _rounds_pixels = False
     _clipped = set()
 
     def create(self, **kwargs):
@@ -1495,8 +1504,10 @@ class MessageTest(AbstractWidgetTest, unittest.TestCase):
         'justify', 'padx', 'pady', 'relief',
         'takefocus', 'text', 'textvariable', 'width',
     )
-    _clipped = {'padx', 'pady', 'borderwidth', 'highlightthickness'}
-    _conv_pixels = False
+    _rounds_pixels = (tk_version < (9,0))
+    _no_round = {'padx', 'pady'}
+    _clipped = {'highlightthickness'} if tk_version < (9,0) else {
+        'borderwidth', 'highlightthickness', 'padx', 'pady'}
 
     def create(self, **kwargs):
         return tkinter.Message(self.root, **kwargs)
@@ -1508,15 +1519,13 @@ class MessageTest(AbstractWidgetTest, unittest.TestCase):
     def test_configure_padx(self):
         widget = self.create()
         self.checkPixelsParam(widget, 'padx', 3, 4.4, 5.6, '12m')#,
-                              #conv=self._conv_pad_pixels)
-        expected = self._default_pixels if 'padx' in self._clipped else -2
+        expected = -2 if tk_version < (9,0) else self._default_pixels
         self.checkParam(widget, 'padx', -2, expected=expected)
 
     def test_configure_pady(self):
         widget = self.create()
         self.checkPixelsParam(widget, 'pady', 3, 4.4, 5.6, '12m')#,
-                              #conv=self._conv_pad_pixels)
-        expected = self._default_pixels if 'pady' in self._clipped else -2
+        expected = -2 if tk_version < (9,0) else self._default_pixels
         self.checkParam(widget, 'pady', -2, expected=expected)
 
     def test_configure_width(self):

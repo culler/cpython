@@ -4,8 +4,10 @@ import re
 import tkinter
 from test.test_tkinter.support import (AbstractTkTest, requires_tk, tk_version,
                                   pixels_conv, tcl_obj_eq)
-# Message version should depend on the  patchlevel
-from test.test_tkinter.support import messages_v2 as messages, is_pixel_str
+if tk_version < (9,0):
+    from test.test_tkinter.support import is_pixel_str, messages_v1 as messages
+else:
+    from test.test_tkinter.support import is_pixel_str, messages_v2 as messages
 import test.support
 
 _sentinel = object()
@@ -14,9 +16,10 @@ _sentinel = object()
 # borderwidth = bd
 
 class AbstractWidgetTest(AbstractTkTest):
-    _default_pixels = ''
-    _conv_pixels = round
-    _stringify = False
+    _default_pixels = ''   # Value for unset pixel options.
+    _rounds_pixels = True  # True if some pixel options are rounded.
+    _no_round = {}         # Pixel options which are not rounded nonetheless
+    _stringify = False     # Whether to convert tuples to strings
     _allow_empty_justify = False
 
     @property
@@ -157,8 +160,10 @@ class AbstractWidgetTest(AbstractTkTest):
         pass
 
     def checkPixelsParam(self, widget, name, *values, conv=None, **kwargs):
-        if conv is None:
-            conv = self._conv_pixels
+        if not self._rounds_pixels or name in self._no_round:
+            conv = False
+        else:
+            conv = round
         for value in values:
             expected = _sentinel
             conv1 = conv
@@ -253,27 +258,22 @@ class PixelOptionsTests:
         widget = self.create()
         self.checkPixelsParam(widget, 'borderwidth',
                               0, 1.3, 2.6, 6, '10p')
-        self.checkParam(widget, 'borderwidth', -2)#, conv=self._conv_pixels)
+        self.checkParam(widget, 'borderwidth', -2)
         if 'bd' in self.OPTIONS:
             self.checkPixelsParam(widget, 'bd', 0, 1.3, 2.6, 6, '10p')
-            self.checkParam(widget, 'bd', -2, expected=expected)#,
-                            #conv=self._conv_pixels)
+            self.checkParam(widget, 'bd', -2, expected=expected)
 
     def test_configure_highlightthickness(self):
         widget = self.create()
         self.checkPixelsParam(widget, 'highlightthickness',
                               0, 1.3, 2.6, 6, '10p')
-        #expected = 0 if self._clip_highlightthickness else -2
-        self.checkParam(widget, 'highlightthickness', -2, # expected=expected,
-                        conv=self._conv_pixels)
+        self.checkParam(widget, 'highlightthickness', -2)
 
     def test_configure_insertborderwidth(self):
         widget = self.create()
         self.checkPixelsParam(widget, 'insertborderwidth',
                               0, 1.3, 2.6, 6, '10p')
-        #expected = 0 if self._clip_insertborderwidth else -2
-        self.checkParam(widget, 'insertborderwidth', -2, #expected=expected,
-                        conv=self._conv_pixels)
+        self.checkParam(widget, 'insertborderwidth', -2)
 
     def test_configure_insertwidth(self):
         widget = self.create()

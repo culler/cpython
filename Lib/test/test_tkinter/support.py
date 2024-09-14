@@ -3,7 +3,7 @@ import re
 import tkinter
 
 messages_v1 = {
-    'no_busy': 'can\'t find busy window',
+    'no_busy': 'can\'t find busy window.*',
     'no_font': 'font "{}" doesn\'t exist',
     'no_image': 'image "{}" doesn\'t exist',
     }
