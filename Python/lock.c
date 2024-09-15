@@ -355,7 +355,7 @@ _PyOnceFlag_CallOnceSlow(_PyOnceFlag *flag, _Py_once_fn_t *fn, void *arg)
 static int
 recursive_mutex_is_owned_by(_PyRecursiveMutex *m, PyThread_ident_t tid)
 {
-  return tid == _Py_atomic_load_uint64_relaxed(&m->thread);
+    return _Py_atomic_load_ullong_relaxed(&m->thread) == tid;
 }
 
 int
@@ -373,7 +373,7 @@ _PyRecursiveMutex_Lock(_PyRecursiveMutex *m)
         return;
     }
     PyMutex_Lock(&m->mutex);
-    _Py_atomic_store_uint64_relaxed(&m->thread, thread);
+    _Py_atomic_store_ullong_relaxed(&m->thread, thread);
     assert(m->level == 0);
 }
 
@@ -390,7 +390,7 @@ _PyRecursiveMutex_Unlock(_PyRecursiveMutex *m)
         return;
     }
     assert(m->level == 0);
-    _Py_atomic_store_uint64_relaxed(&m->thread, 0);
+    _Py_atomic_store_ullong_relaxed(&m->thread, 0);
     PyMutex_Unlock(&m->mutex);
 }
 
