@@ -139,8 +139,9 @@ class LabelFrameTest(AbstractToplevelTest, unittest.TestCase):
         'labelanchor', 'labelwidget', 'padx', 'pady', 'relief',
         'takefocus', 'text', 'visual', 'width',
     )
-    _no_round = {} if tk_version < (9,0) else {'borderwidth', 'height',
-        'highlightthickness', 'padx', 'pady', 'width'}
+    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {
+        'borderwidth', 'height', 'highlightthickness', 'padx', 'pady',
+        'width'}
 
     def create(self, **kwargs):
         return tkinter.LabelFrame(self.root, **kwargs)
