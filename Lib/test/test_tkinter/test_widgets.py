@@ -28,7 +28,9 @@ def float_round(x):
 
 
 class AbstractToplevelTest(AbstractWidgetTest, PixelSizeTests):
-    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {}
+    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {
+        'borderwidth', 'height', 'highlightthickness', 'padx', 'pady',
+        'width'}
     _clipped = {
         'highlightthickness'} if tk_version < (9,0) else {
         'borderwidth', 'height', 'highlightthickness', 'padx', 'pady',
@@ -119,7 +121,9 @@ class FrameTest(AbstractToplevelTest, unittest.TestCase):
         'highlightbackground', 'highlightcolor', 'highlightthickness',
         'padx', 'pady', 'relief', 'takefocus', 'tile', 'visual', 'width',
     )
-    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {}
+    _no_round = {'padx', 'pady'} if tk_version < (9,0) else {
+        'borderwidth', 'height', 'highlightthickness', 'padx', 'pady',
+        'width'}
 
     def create(self, **kwargs):
         return tkinter.Frame(self.root, **kwargs)
@@ -135,6 +139,8 @@ class LabelFrameTest(AbstractToplevelTest, unittest.TestCase):
         'labelanchor', 'labelwidget', 'padx', 'pady', 'relief',
         'takefocus', 'text', 'visual', 'width',
     )
+    _no_round = {} if tk_version < (9,0) else {'borderwidth', 'height',
+        'highlightthickness', 'padx', 'pady', 'width'}
 
     def create(self, **kwargs):
         return tkinter.LabelFrame(self.root, **kwargs)
@@ -1252,10 +1258,13 @@ class PanedWindowTest(AbstractWidgetTest, unittest.TestCase):
         'showhandle', 'width',
     )
     _rounds_pixels = True
-    _no_round = {'handlesize', 'height', 'proxyborderwidth', 'sashwidth',
-                     'selectborderwidth', 'width'}
-    _clipped = {} if tk_version < (9,0) else {'borderwidth'}
-
+    _no_round = {'handlesize', 'height', 'proxyborderwidth',
+                     'sashwidth', 'selectborderwidth', 'width'
+                } if tk_version < (9,0) else {'borderwidth',
+                    'handlepad', 'handlesize',
+                    'height', 'proxyborderwidth', 'sashpad',
+                    'sashwidth', 'selectborderwidth', 'width'}
+    _clipped = {}
     default_orient = 'horizontal'
 
     def create(self, **kwargs):
