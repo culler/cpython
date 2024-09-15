@@ -145,7 +145,7 @@ class AbstractWidgetTest(AbstractTkTest):
                                        errmsg='ambiguous' + errmsg2)
             errmsg = 'bad' + errmsg2
         self.checkInvalidParam(widget, name, 'spam', errmsg=errmsg)
-        
+
     def XcheckPixelsParam(self, widget, name, *values, conv=None, **kwargs):
         # Some widget options can be specified as distances which are
         # independent from the screen resolution.  These distances are

@@ -392,7 +392,7 @@ class EntryTest(AbstractWidgetTest, unittest.TestCase):
             self.checkParam(widget, 'insertwidth', 0.1)
             self.checkParam(widget, 'insertwidth', -2, expected=0)
             self.checkParam(widget, 'insertwidth', 0.9)
-            
+
     def test_configure_invalidcommand(self):
         widget = self.create()
         self.checkCommandParam(widget, 'invalidcommand')
